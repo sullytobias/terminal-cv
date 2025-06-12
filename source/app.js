@@ -14,14 +14,42 @@ const menuItems = [
 	'❌ Exit',
 ];
 
-const App = ({name = 'Sullivan Tobias'}) => {
+const App = ({name = 'SULLIVAN', print = false, lang = 'en'}) => {
 	const {exit} = useApp();
 	const [selectedIndex, setSelectedIndex] = useState(0);
-	const [view, setView] = useState('loading');
+	const [view, setView] = useState(print ? 'print' : 'loading');
 	const [typedSubtitle, setTypedSubtitle] = useState('');
 	const [projectIndex, setProjectIndex] = useState(0);
 
-	const fullSubtitle = 'Front-end Developer | 3D Enthusiast | Creative Coder';
+	const isFR = lang === 'fr';
+	const subtitleText = isFR ? 'Développeur Frontend' : 'Frontend Developer';
+	const title = figlet.textSync(name.toUpperCase(), {
+		horizontalLayout: 'default',
+	});
+
+	if (view === 'print') {
+		return (
+			<Box flexDirection="column">
+				<Text>{gradient.pastel.multiline(title)}</Text>
+				<Text color="cyan">{chalk.bold(subtitleText)}</Text>
+				<Text>
+					{isFR
+						? `Je suis ${name}, développeur frontend passionné par la 3D, les expériences web immersives, et les outils créatifs.`
+						: `I'm ${name}, a frontend developer passionate about 3D, immersive web experiences, and creative dev tools.`}
+				</Text>
+				<Text bold>{isFR ? 'Projets :' : 'Projects:'}</Text>
+				{projects.map((p, i) => (
+					<Text key={i}>- {p}</Text>
+				))}
+				<Text bold>{isFR ? 'Compétences :' : 'Skills:'}</Text>
+				<Text>React, Three.js, Node.js, Zustand, Tailwind, Framer Motion</Text>
+				<Text>
+					GitHub: https://github.com/sullytobias
+					{'\n'}LinkedIn: https://linkedin.com/in/sullivan-tobias-340807157
+				</Text>
+			</Box>
+		);
+	}
 
 	useEffect(() => {
 		if (view === 'loading') {
@@ -34,9 +62,9 @@ const App = ({name = 'Sullivan Tobias'}) => {
 		if (view === 'title') {
 			let i = 0;
 			const interval = setInterval(() => {
-				setTypedSubtitle(prev => prev + fullSubtitle[i]);
+				setTypedSubtitle(prev => prev + subtitleText[i]);
 				i++;
-				if (i >= fullSubtitle.length) {
+				if (i >= subtitleText.length) {
 					clearInterval(interval);
 					setTimeout(() => setView('menu'), 400);
 				}
@@ -72,7 +100,7 @@ const App = ({name = 'Sullivan Tobias'}) => {
 				} else if (label.includes('GitHub')) {
 					open('https://github.com/sullytobias');
 				} else if (label.includes('LinkedIn')) {
-					open('https://linkedin.com/in/sullytobias');
+					open('https://linkedin.com/in/sullivan-tobias-340807157');
 				}
 			}
 		}
@@ -88,7 +116,9 @@ const App = ({name = 'Sullivan Tobias'}) => {
 	const renderMenu = () => (
 		<Box flexDirection="column" marginTop={1}>
 			<Text color="greenBright">
-				Use ↑ ↓ to navigate. Enter to select. Escape to return.
+				{isFR
+					? 'Utilisez ↑ ↓ pour naviguer. Entrée pour sélectionner. Échap pour revenir.'
+					: 'Use ↑ ↓ to navigate. Enter to select. Escape to return.'}
 			</Text>
 			{menuItems.map((item, index) => (
 				<Text key={item} inverse={index === selectedIndex}>
@@ -126,7 +156,6 @@ const App = ({name = 'Sullivan Tobias'}) => {
 		}
 	};
 
-	const title = figlet.textSync(name, {horizontalLayout: 'default'});
 	const loadingAnimation = ['⠋', '⠙', '⠸', '⠴', '⠦', '⠇'];
 	const [loadingFrame, setLoadingFrame] = useState(0);
 
@@ -150,7 +179,7 @@ const App = ({name = 'Sullivan Tobias'}) => {
 			{view === 'title' && <Text color="cyan">{typedSubtitle}</Text>}
 			{view !== 'loading' && view !== 'title' && (
 				<>
-					<Text color="cyan">{chalk.bold(fullSubtitle)}</Text>
+					<Text color="cyan">{chalk.bold(subtitleText)}</Text>
 					{renderView()}
 				</>
 			)}
