@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import figlet from 'figlet';
 import gradient from 'gradient-string';
 import open from 'open';
+import themes from './themes.js';
 
 const menuItems = [
 	'👤 About',
@@ -14,18 +15,22 @@ const menuItems = [
 	'❌ Exit',
 ];
 
-const App = ({name = 'SULLIVAN', print = false, lang = 'en', theme}) => {
+const App = ({
+	name = 'SULLIVAN',
+	print = false,
+	lang = 'en',
+	theme = themes.light,
+}) => {
 	const {exit} = useApp();
+
+	const selectedTheme = themes[theme];
+
+	const {accent, text, highlight} = selectedTheme;
+
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const [view, setView] = useState(print ? 'print' : 'loading');
 	const [typedSubtitle, setTypedSubtitle] = useState('');
 	const [projectIndex, setProjectIndex] = useState(0);
-
-	const isDark = theme === 'dark';
-
-	const accent = isDark ? 'magentaBright' : 'cyan';
-	const text = isDark ? 'whiteBright' : 'gray';
-	const highlight = isDark ? 'blueBright' : 'greenBright';
 
 	const isFR = lang === 'fr';
 	const subtitleText = isFR ? 'Développeur Frontend' : 'Frontend Developer';
