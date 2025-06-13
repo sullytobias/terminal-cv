@@ -14,12 +14,18 @@ const menuItems = [
 	'❌ Exit',
 ];
 
-const App = ({name = 'SULLIVAN', print = false, lang = 'en'}) => {
+const App = ({name = 'SULLIVAN', print = false, lang = 'en', theme}) => {
 	const {exit} = useApp();
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const [view, setView] = useState(print ? 'print' : 'loading');
 	const [typedSubtitle, setTypedSubtitle] = useState('');
 	const [projectIndex, setProjectIndex] = useState(0);
+
+	const isDark = theme === 'dark';
+
+	const accent = isDark ? 'magentaBright' : 'cyan';
+	const text = isDark ? 'whiteBright' : 'gray';
+	const highlight = isDark ? 'blueBright' : 'greenBright';
 
 	const isFR = lang === 'fr';
 	const subtitleText = isFR ? 'Développeur Frontend' : 'Frontend Developer';
@@ -115,7 +121,7 @@ const App = ({name = 'SULLIVAN', print = false, lang = 'en'}) => {
 
 	const renderMenu = () => (
 		<Box flexDirection="column" marginTop={1}>
-			<Text color="greenBright">
+			<Text color={highlight}>
 				{isFR
 					? 'Utilisez ↑ ↓ pour naviguer. Entrée pour sélectionner. Échap pour revenir.'
 					: 'Use ↑ ↓ to navigate. Enter to select. Escape to return.'}
@@ -147,7 +153,7 @@ const App = ({name = 'SULLIVAN', print = false, lang = 'en'}) => {
 				);
 			case 'skills':
 				return (
-					<Text>
+					<Text color={text}>
 						React, Three.js, Node.js, Zustand, Tailwind, Framer Motion
 					</Text>
 				);
@@ -179,7 +185,7 @@ const App = ({name = 'SULLIVAN', print = false, lang = 'en'}) => {
 			{view === 'title' && <Text color="cyan">{typedSubtitle}</Text>}
 			{view !== 'loading' && view !== 'title' && (
 				<>
-					<Text color="cyan">{chalk.bold(subtitleText)}</Text>
+					<Text color={accent}>{chalk.bold(subtitleText)}</Text>
 					{renderView()}
 				</>
 			)}

@@ -10,14 +10,13 @@ const cli = meow(
     $ terminal-cv [options]
 
   Options
-    --name     Your name (ASCII title override)
-    --print    Print full resume and exit (no interaction)
+    --name     Your name (ASCII title)
+    --print    Print mode (no interaction)
     --lang     Language (en or fr)
+    --theme    Theme (light or dark)
 
   Examples
-	  $ terminal-cv --name=Sully
-    $ terminal-cv --print
-    $ terminal-cv --lang=fr
+    $ terminal-cv --theme=dark --lang=fr
 `,
 	{
 		importMeta: import.meta,
@@ -29,5 +28,6 @@ render(
 		name={cli.flags.name}
 		print={cli.flags.print}
 		lang={cli.flags.lang || 'en'}
+		theme={cli.flags.theme || 'light'}
 	/>,
 );
