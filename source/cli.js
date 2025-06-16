@@ -10,17 +10,18 @@ const cli = meow(
     $ terminal-cv [options]
 
   Options
-    --name     Your name (ASCII title)
-    --print    Print mode (no interaction)
-    --lang     Language (en or fr)
-    --theme    Theme (light or dark)
+    --name       Your name
+    --print      Show full CV and exit
+    --lang       Language (en or fr)
+    --theme      Theme (light or dark)
+    --export     Export CV to .md or .txt
+    --section    Directly show a section (about, projects, skills)
+    --autoplay   Auto navigate through sections
 
   Examples
-    $ terminal-cv --theme=dark --lang=fr
+    $ terminal-cv --section=projects
 `,
-	{
-		importMeta: import.meta,
-	},
+	{importMeta: import.meta},
 );
 
 render(
@@ -29,5 +30,8 @@ render(
 		print={cli.flags.print}
 		lang={cli.flags.lang || 'en'}
 		theme={cli.flags.theme || 'light'}
+		exportFormat={cli.flags.export}
+		section={cli.flags.section}
+		autoplay={cli.flags.autoplay}
 	/>,
 );

@@ -2,7 +2,10 @@
 	"name": "terminal-cv",
 	"version": "0.0.0",
 	"license": "MIT",
-	"bin": "dist/cli.js",
+	"bin": {
+		"terminal-cv": "./dist/cli.js",
+		"terminal-cv-standalone": "./dist/standalone.js"
+	},
 	"type": "module",
 	"engines": {
 		"node": ">=16"

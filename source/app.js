@@ -1,5 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import {Box, Text, useInput, useApp} from 'ink';
+
+import fs from 'fs';
+import path from 'path';
+import {fileURLToPath} from 'url';
 import chalk from 'chalk';
 import figlet from 'figlet';
 import gradient from 'gradient-string';
@@ -12,31 +16,92 @@ const menuItems = [
 	'🛠 Skills',
 	'🔗 GitHub',
 	'🔗 LinkedIn',
+	'🌍 Switch Language',
 	'❌ Exit',
 ];
+
+const autoplayViews = ['about', 'projects', 'skills'];
 
 const App = ({
 	name = 'SULLIVAN',
 	print = false,
-	lang = 'en',
-	theme = themes.light,
+	lang: initialLang = 'en',
+	theme = 'light',
+	exportFormat,
+	section,
+	autoplay = false,
 }) => {
 	const {exit} = useApp();
+
+	const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 	const selectedTheme = themes[theme];
 
 	const {accent, text, highlight} = selectedTheme;
 
 	const [selectedIndex, setSelectedIndex] = useState(0);
-	const [view, setView] = useState(print ? 'print' : 'loading');
+	const [view, setView] = useState(
+		print
+			? 'print'
+			: section
+			? section.toLowerCase()
+			: autoplay
+			? 'about'
+			: 'loading',
+	);
+
 	const [typedSubtitle, setTypedSubtitle] = useState('');
 	const [projectIndex, setProjectIndex] = useState(0);
 
-	const isFR = lang === 'fr';
+	// language handling
+	const [currentLang, setLang] = useState(initialLang);
+	const [langChanged, setLangChanged] = useState(false);
+	const [toastFrame, setToastFrame] = useState(0);
+	const isFR = currentLang === 'fr';
+
 	const subtitleText = isFR ? 'Développeur Frontend' : 'Frontend Developer';
 	const title = figlet.textSync(name.toUpperCase(), {
 		horizontalLayout: 'default',
 	});
+
+	if (exportFormat === 'md' || exportFormat === 'txt') {
+		const isFR = currentLang === 'fr';
+
+		const title = `# ${name}\n\n`;
+		const subtitle = isFR
+			? '## Développeur Frontend\n\n'
+			: '## Frontend Developer\n\n';
+		const about = isFR
+			? `Je suis ${name}, développeur frontend passionné par la 3D, les expériences web immersives, et les outils créatifs.\n\n`
+			: `I'm ${name}, a frontend developer passionate about 3D, immersive web experiences, and creative dev tools.\n\n`;
+
+		const projectTitle = isFR ? '### Projets\n' : '### Projects\n';
+		const projectList = projects.map(p => `- ${p}`).join('\n') + '\n\n';
+
+		const skillsTitle = isFR ? '### Compétences\n' : '### Skills\n';
+		const skillsList =
+			'React, Three.js, Node.js, Zustand, Tailwind, Framer Motion\n\n';
+
+		const links =
+			'GitHub: https://github.com/sullytobias\n' +
+			'LinkedIn: https://linkedin.com/in/sullivan-tobias-340807157\n';
+
+		const content =
+			title +
+			subtitle +
+			about +
+			projectTitle +
+			projectList +
+			skillsTitle +
+			skillsList +
+			links;
+
+		const fileName = `resume.${exportFormat}`;
+		const outputPath = path.join(__dirname, '..', fileName);
+		fs.writeFileSync(outputPath, content);
+		console.log(`✅ Exported to ${fileName}`);
+		process.exit(0);
+	}
 
 	if (view === 'print') {
 		return (
@@ -61,6 +126,19 @@ const App = ({
 			</Box>
 		);
 	}
+
+	useEffect(() => {
+		if (!autoplay) return;
+
+		const index = autoplayViews.indexOf(view);
+		if (index === -1 || index >= autoplayViews.length - 1) return;
+
+		const timer = setTimeout(() => {
+			setView(autoplayViews[index + 1]);
+		}, 2500);
+
+		return () => clearTimeout(timer);
+	}, [view, autoplay]);
 
 	useEffect(() => {
 		if (view === 'loading') {
@@ -112,6 +190,26 @@ const App = ({
 					open('https://github.com/sullytobias');
 				} else if (label.includes('LinkedIn')) {
 					open('https://linkedin.com/in/sullivan-tobias-340807157');
+				} else if (label.includes('Switch')) {
+					setLang(prev => {
+						const next = prev === 'fr' ? 'en' : 'fr';
+						setLangChanged(true);
+						setToastFrame(0);
+
+						const interval = setInterval(() => {
+							setToastFrame(prev => {
+								if (prev >= 5) {
+									clearInterval(interval);
+									return prev;
+								}
+								return prev + 1;
+							});
+						}, 100);
+
+						// Hide after 1.5s
+						setTimeout(() => setLangChanged(false), 1500);
+						return next;
+					});
 				}
 			}
 		}
@@ -193,6 +291,15 @@ const App = ({
 					<Text color={accent}>{chalk.bold(subtitleText)}</Text>
 					{renderView()}
 				</>
+			)}
+			{langChanged && (
+				<Text color="green">
+					{' '.repeat(5 - toastFrame)}
+					{toastFrame % 2 === 0 ? '👉 ' : ''}
+					{currentLang === 'fr'
+						? 'Langue changée : Français 🇫🇷'
+						: 'Language switched: English 🇬🇧'}
+				</Text>
 			)}
 		</Box>
 	);
