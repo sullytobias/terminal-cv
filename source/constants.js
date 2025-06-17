@@ -16,7 +16,7 @@ export const projectsData = [
 export const menuItemsEN = [
 	'\uD83D\uDC64 About',
 	'\uD83D\uDCBC Projects',
-	'\uD83D\uDEE0 Skills',
+	'\uD83D\uDEE0  Skills',
 	'\uD83D\uDD17 GitHub',
 	'\uD83D\uDD17 LinkedIn',
 	'\uD83C\uDF0D Switch Language',
@@ -27,7 +27,7 @@ export const menuItemsEN = [
 export const menuItemsFR = [
 	'\uD83D\uDC64 À propos',
 	'\uD83D\uDCBC Projets',
-	'\uD83D\uDEE0 Compétences',
+	'\uD83D\uDEE0  Compétences',
 	'\uD83D\uDD17 GitHub',
 	'\uD83D\uDD17 LinkedIn',
 	'\uD83C\uDF0D Changer de langue',
