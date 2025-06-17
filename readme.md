@@ -9,6 +9,9 @@ A beautiful and interactive terminal-based CV/resume viewer built with React and
 - 🔗 Interactive links to your social profiles and projects
 - 📄 Easy to customize and update
 - 🚀 Built with React and Ink for a modern development experience
+- 🌈 Multiple themes and visual effects
+- 🌍 Bilingual support (English/French)
+- 🎮 Interactive navigation and animations
 
 ## Install
 
@@ -25,24 +28,39 @@ $ terminal-cv --help
     $ terminal-cv [options]
 
   Options
-    --name       Your name
+    --name       Your name to display in the CV
     --print      Show full CV and exit
-    --lang       Language (en or fr)
-    --theme      Theme (light, dark, neon, or retro)
-    --export     Export CV to .md or .txt
-    --section    Directly show a section (about, projects, skills)
-    --autoplay   Auto navigate through sections
-    --sound      Enable terminal sounds
-    --matrix     Enable matrix effect
+    --lang       Language selection (en or fr)
+    --theme      Visual theme (light, dark, neon, or retro)
+    --export     Export CV format (md or txt)
+    --section    Show specific section (about, projects, skills)
+    --autoplay   Auto-navigate through sections
+    --sound      Enable terminal sound effects
+    --matrix     Enable Matrix-style background effect
 
   Examples
     $ terminal-cv --name="John Doe"
     $ terminal-cv --theme=dark --lang=fr
     $ terminal-cv --section=projects
     $ terminal-cv --export=md
+    $ terminal-cv --autoplay --matrix
 ```
 
 ## Configuration
+
+### Command Line Options
+
+| Option       | Description                    | Default | Values                        |
+| ------------ | ------------------------------ | ------- | ----------------------------- |
+| `--name`     | Your name to display in the CV | -       | Any string                    |
+| `--print`    | Show full CV and exit          | false   | true/false                    |
+| `--lang`     | Language selection             | 'en'    | 'en'/'fr'                     |
+| `--theme`    | Visual theme                   | 'light' | 'light'/'dark'/'neon'/'retro' |
+| `--export`   | Export CV format               | -       | 'md'/'txt'                    |
+| `--section`  | Show specific section          | -       | 'about'/'projects'/'skills'   |
+| `--autoplay` | Auto-navigate through sections | false   | true/false                    |
+| `--sound`    | Enable terminal sound effects  | false   | true/false                    |
+| `--matrix`   | Enable Matrix-style background | false   | true/false                    |
 
 ### Themes
 

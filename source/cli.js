@@ -10,18 +10,22 @@ const cli = meow(
     $ terminal-cv [options]
 
   Options
-    --name       Your name
+    --name       Your name to display in the CV
     --print      Show full CV and exit
-    --lang       Language (en or fr)
-    --theme      Theme (light or dark)
-    --export     Export CV to .md or .txt
-    --section    Directly show a section (about, projects, skills)
-    --autoplay   Auto navigate through sections
-	--sound      Enable terminal sounds
-	--matrix 	 Enable matrix effect
+    --lang       Language selection (en or fr)
+    --theme      Visual theme (light, dark, neon, or retro)
+    --export     Export CV format (md or txt)
+    --section    Show specific section (about, projects, skills)
+    --autoplay   Auto-navigate through sections
+    --sound      Enable terminal sound effects
+    --matrix     Enable Matrix-style background effect
 
   Examples
+    $ terminal-cv --name="John Doe"
+    $ terminal-cv --theme=dark --lang=fr
     $ terminal-cv --section=projects
+    $ terminal-cv --export=md
+    $ terminal-cv --autoplay --matrix
 `,
 	{importMeta: import.meta},
 );
