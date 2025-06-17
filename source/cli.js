@@ -17,8 +17,8 @@ const cli = meow(
     --export     Export CV to .md or .txt
     --section    Directly show a section (about, projects, skills)
     --autoplay   Auto navigate through sections
-		--sound      Enable terminal sounds
-		--matrix 		 Enable matrix effect
+	--sound      Enable terminal sounds
+	--matrix 	 Enable matrix effect
 
   Examples
     $ terminal-cv --section=projects

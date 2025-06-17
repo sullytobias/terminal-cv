@@ -13,15 +13,29 @@ export const projectsData = [
 	{link: 'https://github.com/sullytobias/tidy-tab'},
 ];
 
-export const menuItems = [
+export const menuItemsEN = [
 	'\uD83D\uDC64 About',
 	'\uD83D\uDCBC Projects',
 	'\uD83D\uDEE0 Skills',
 	'\uD83D\uDD17 GitHub',
 	'\uD83D\uDD17 LinkedIn',
 	'\uD83C\uDF0D Switch Language',
+	'🎮 Play Reaction Game',
 	'\u274C Exit',
 ];
+
+export const menuItemsFR = [
+	'\uD83D\uDC64 À propos',
+	'\uD83D\uDCBC Projets',
+	'\uD83D\uDEE0 Compétences',
+	'\uD83D\uDD17 GitHub',
+	'\uD83D\uDD17 LinkedIn',
+	'\uD83C\uDF0D Changer de langue',
+	'🎮 Jouer au jeu de réaction',
+	'\u274C Quitter',
+];
+
+export const getMenuItems = isFR => (isFR ? menuItemsFR : menuItemsEN);
 
 export const autoplayViews = ['about', 'projects', 'skills'];
 

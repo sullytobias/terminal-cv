@@ -3,7 +3,7 @@ import {Box, Text, useInput, useApp} from 'ink';
 
 import MatrixRain from './MatrixRain.js';
 
-import {menuItems, autoplayViews, projectsData} from './constants.js';
+import {autoplayViews, projectsData, getMenuItems} from './constants.js';
 import {fetchRepos} from './api.js';
 
 import Menu from './views/Menu.js';
@@ -11,8 +11,6 @@ import About from './views/About.js';
 import Projects from './views/Projects.js';
 import Skills from './views/Skills.js';
 
-import path from 'path';
-import {fileURLToPath} from 'url';
 import chalk from 'chalk';
 import figlet from 'figlet';
 import open from 'open';
@@ -21,6 +19,7 @@ import Toast from './views/Toast.js';
 import Header from './views/Header.js';
 import Print from './views/Print.js';
 import {exportToFile} from './exporter.js';
+import Game from './views/Games.js';
 
 const App = ({
 	name = 'SULLIVAN',
@@ -61,6 +60,8 @@ const App = ({
 	const isFR = currentLang === 'fr';
 
 	const subtitleText = isFR ? 'Développeur Frontend' : 'Frontend Developer';
+
+	const menuItems = getMenuItems(isFR);
 
 	const title = figlet.textSync(name.toUpperCase(), {
 		font: theme === 'retro' ? 'Computer' : 'Standard',
@@ -145,19 +146,27 @@ const App = ({
 				);
 			} else if (key.return) {
 				const label = menuItems[selectedIndex];
-				if (label.includes('Exit')) {
+				if (label.includes('Exit') || label.includes('Quitter')) {
 					exit();
-				} else if (label.includes('About')) {
+				} else if (label.includes('About') || label.includes('À propos')) {
 					setView('about');
-				} else if (label.includes('Projects')) {
+				} else if (label.includes('Projects') || label.includes('Projets')) {
 					setView('projects');
-				} else if (label.includes('Skills')) {
+				} else if (label.includes('Skills') || label.includes('Compétences')) {
 					setView('skills');
 				} else if (label.includes('GitHub')) {
 					open('https://github.com/sullytobias');
 				} else if (label.includes('LinkedIn')) {
 					open('https://linkedin.com/in/sullivan-tobias-340807157');
-				} else if (label.includes('Switch')) {
+				} else if (
+					label.includes('Play Reaction Game') ||
+					label.includes('Jouer au jeu de réaction')
+				) {
+					setView('game');
+				} else if (
+					label.includes('Switch') ||
+					label.includes('Changer de langue')
+				) {
 					setLang(prev => {
 						const next = prev === 'fr' ? 'en' : 'fr';
 						setLangChanged(true);
@@ -196,6 +205,8 @@ const App = ({
 				);
 			case 'skills':
 				return <Skills isFR={isFR} color={text} />;
+			case 'game':
+				return <Game onExit={() => setView('menu')} isFR={isFR} />;
 			default:
 				return (
 					<Menu
