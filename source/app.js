@@ -1,26 +1,26 @@
 import React, {useState, useEffect} from 'react';
 import {Box, Text, useInput, useApp} from 'ink';
 
-import fs from 'fs';
+import MatrixRain from './MatrixRain.js';
+
+import {menuItems, autoplayViews, projectsData} from './constants.js';
+import {fetchRepos} from './api.js';
+
+import Menu from './views/Menu.js';
+import About from './views/About.js';
+import Projects from './views/Projects.js';
+import Skills from './views/Skills.js';
+
 import path from 'path';
 import {fileURLToPath} from 'url';
 import chalk from 'chalk';
 import figlet from 'figlet';
-import gradient from 'gradient-string';
 import open from 'open';
 import themes from './themes.js';
-
-const menuItems = [
-	'👤 About',
-	'💼 Projects',
-	'🛠 Skills',
-	'🔗 GitHub',
-	'🔗 LinkedIn',
-	'🌍 Switch Language',
-	'❌ Exit',
-];
-
-const autoplayViews = ['about', 'projects', 'skills'];
+import Toast from './views/Toast.js';
+import Header from './views/Header.js';
+import Print from './views/Print.js';
+import {exportToFile} from './exporter.js';
 
 const App = ({
 	name = 'SULLIVAN',
@@ -30,10 +30,10 @@ const App = ({
 	exportFormat,
 	section,
 	autoplay = false,
+	sound = false,
+	matrix = false,
 }) => {
 	const {exit} = useApp();
-
-	const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 	const selectedTheme = themes[theme];
 
@@ -51,7 +51,8 @@ const App = ({
 	);
 
 	const [typedSubtitle, setTypedSubtitle] = useState('');
-	const [projectIndex, setProjectIndex] = useState(0);
+
+	const [repos, setRepos] = useState([]);
 
 	// language handling
 	const [currentLang, setLang] = useState(initialLang);
@@ -60,72 +61,36 @@ const App = ({
 	const isFR = currentLang === 'fr';
 
 	const subtitleText = isFR ? 'Développeur Frontend' : 'Frontend Developer';
+
 	const title = figlet.textSync(name.toUpperCase(), {
-		horizontalLayout: 'default',
+		font: theme === 'retro' ? 'Computer' : 'Standard',
 	});
 
 	if (exportFormat === 'md' || exportFormat === 'txt') {
-		const isFR = currentLang === 'fr';
-
-		const title = `# ${name}\n\n`;
-		const subtitle = isFR
-			? '## Développeur Frontend\n\n'
-			: '## Frontend Developer\n\n';
-		const about = isFR
-			? `Je suis ${name}, développeur frontend passionné par la 3D, les expériences web immersives, et les outils créatifs.\n\n`
-			: `I'm ${name}, a frontend developer passionate about 3D, immersive web experiences, and creative dev tools.\n\n`;
-
-		const projectTitle = isFR ? '### Projets\n' : '### Projects\n';
-		const projectList = projects.map(p => `- ${p}`).join('\n') + '\n\n';
-
-		const skillsTitle = isFR ? '### Compétences\n' : '### Skills\n';
-		const skillsList =
-			'React, Three.js, Node.js, Zustand, Tailwind, Framer Motion\n\n';
-
-		const links =
-			'GitHub: https://github.com/sullytobias\n' +
-			'LinkedIn: https://linkedin.com/in/sullivan-tobias-340807157\n';
-
-		const content =
-			title +
-			subtitle +
-			about +
-			projectTitle +
-			projectList +
-			skillsTitle +
-			skillsList +
-			links;
-
-		const fileName = `resume.${exportFormat}`;
-		const outputPath = path.join(__dirname, '..', fileName);
-		fs.writeFileSync(outputPath, content);
-		console.log(`✅ Exported to ${fileName}`);
-		process.exit(0);
+		exportToFile({
+			name,
+			isFR,
+			repos: repos.length ? repos : projectsData,
+			format: exportFormat,
+		});
 	}
 
-	if (view === 'print') {
+	if (view === 'print')
 		return (
-			<Box flexDirection="column">
-				<Text>{gradient.pastel.multiline(title)}</Text>
-				<Text color="cyan">{chalk.bold(subtitleText)}</Text>
-				<Text>
-					{isFR
-						? `Je suis ${name}, développeur frontend passionné par la 3D, les expériences web immersives, et les outils créatifs.`
-						: `I'm ${name}, a frontend developer passionate about 3D, immersive web experiences, and creative dev tools.`}
-				</Text>
-				<Text bold>{isFR ? 'Projets :' : 'Projects:'}</Text>
-				{projects.map((p, i) => (
-					<Text key={i}>- {p}</Text>
-				))}
-				<Text bold>{isFR ? 'Compétences :' : 'Skills:'}</Text>
-				<Text>React, Three.js, Node.js, Zustand, Tailwind, Framer Motion</Text>
-				<Text>
-					GitHub: https://github.com/sullytobias
-					{'\n'}LinkedIn: https://linkedin.com/in/sullivan-tobias-340807157
-				</Text>
-			</Box>
+			<Print
+				title={title}
+				subtitleText={subtitleText}
+				isFR={isFR}
+				name={name}
+				repos={repos.length ? repos : projectsData}
+			/>
 		);
-	}
+
+	useEffect(() => {
+		fetchRepos(['sullytobias', 'sullivantobias'])
+			.then(r => setRepos(r))
+			.catch(e => console.error(e));
+	}, []);
 
 	useEffect(() => {
 		if (!autoplay) return;
@@ -163,11 +128,14 @@ const App = ({
 	}, [view]);
 
 	useInput((input, key) => {
+		if (sound) process.stdout.write('\x07'); //
+
 		if (key.escape) {
-			setView('menu');
+			if (view !== 'menu') {
+				setView('menu');
+			}
 			return;
 		}
-
 		if (view === 'menu') {
 			if (key.downArrow) {
 				setSelectedIndex(prev => (prev + 1) % menuItems.length);
@@ -182,7 +150,6 @@ const App = ({
 				} else if (label.includes('About')) {
 					setView('about');
 				} else if (label.includes('Projects')) {
-					setProjectIndex(0);
 					setView('projects');
 				} else if (label.includes('Skills')) {
 					setView('skills');
@@ -215,53 +182,28 @@ const App = ({
 		}
 	});
 
-	useEffect(() => {
-		if (view === 'projects' && projectIndex < projects.length) {
-			const timer = setTimeout(() => setProjectIndex(prev => prev + 1), 300);
-			return () => clearTimeout(timer);
-		}
-	}, [view, projectIndex]);
-
-	const renderMenu = () => (
-		<Box flexDirection="column" marginTop={1}>
-			<Text color={highlight}>
-				{isFR
-					? 'Utilisez ↑ ↓ pour naviguer. Entrée pour sélectionner. Échap pour revenir.'
-					: 'Use ↑ ↓ to navigate. Enter to select. Escape to return.'}
-			</Text>
-			{menuItems.map((item, index) => (
-				<Text key={item} inverse={index === selectedIndex}>
-					{item}
-				</Text>
-			))}
-		</Box>
-	);
-
 	const renderView = () => {
 		switch (view) {
 			case 'about':
-				return (
-					<Text>
-						I'm Sullivan Tobias, a frontend developer passionate about 3D,
-						immersive web experiences, and creative dev tools.
-					</Text>
-				);
+				return <About name={name} isFR={isFR} />;
 			case 'projects':
 				return (
-					<Box flexDirection="column">
-						{projects.slice(0, projectIndex).map((project, i) => (
-							<Text key={i}>- {project}</Text>
-						))}
-					</Box>
+					<Projects
+						repos={repos.length ? repos : projectsData}
+						highlight={highlight}
+						accent={accent}
+					/>
 				);
 			case 'skills':
-				return (
-					<Text color={text}>
-						React, Three.js, Node.js, Zustand, Tailwind, Framer Motion
-					</Text>
-				);
+				return <Skills isFR={isFR} color={text} />;
 			default:
-				return renderMenu();
+				return (
+					<Menu
+						selectedIndex={selectedIndex}
+						highlight={highlight}
+						isFR={isFR}
+					/>
+				);
 		}
 	};
 
@@ -278,38 +220,32 @@ const App = ({
 	}, [view]);
 
 	return (
-		<Box flexDirection="column">
-			{view === 'loading' && (
-				<Text color="cyan">
-					{chalk.bold('Loading')} {loadingAnimation[loadingFrame]}
-				</Text>
+		<>
+			{matrix && (
+				<Box flexDirection="column" position="absolute" top={0} left={0}>
+					<MatrixRain />
+				</Box>
 			)}
-			{view !== 'loading' && <Text>{gradient.pastel.multiline(title)}</Text>}
-			{view === 'title' && <Text color="cyan">{typedSubtitle}</Text>}
-			{view !== 'loading' && view !== 'title' && (
-				<>
-					<Text color={accent}>{chalk.bold(subtitleText)}</Text>
-					{renderView()}
-				</>
-			)}
-			{langChanged && (
-				<Text color="green">
-					{' '.repeat(5 - toastFrame)}
-					{toastFrame % 2 === 0 ? '👉 ' : ''}
-					{currentLang === 'fr'
-						? 'Langue changée : Français 🇫🇷'
-						: 'Language switched: English 🇬🇧'}
-				</Text>
-			)}
-		</Box>
+			<Box flexDirection="column">
+				{theme === 'retro' && <Text color="green">[ CRT MODE ENABLED ]</Text>}
+
+				{view === 'loading' && (
+					<Text color="cyan">
+						{chalk.bold('Loading')} {loadingAnimation[loadingFrame]}
+					</Text>
+				)}
+				{view !== 'loading' && <Header name={name} theme={theme} />}
+				{view === 'title' && <Text color="cyan">{typedSubtitle}</Text>}
+				{view !== 'loading' && view !== 'title' && (
+					<>
+						<Text color={accent}>{chalk.bold(subtitleText)}</Text>
+						{renderView()}
+					</>
+				)}
+				{langChanged && <Toast frame={toastFrame} isFR={isFR} />}
+			</Box>
+		</>
 	);
 };
-
-const projects = [
-	'Configurator V2 (React/Three.js)',
-	'JSON Visualizer (React + Diff)',
-	'3D Clock App (React + Timezone)',
-	'CLI CV interactif (Ink)',
-];
 
 export default App;

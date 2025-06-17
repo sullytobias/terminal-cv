@@ -17,6 +17,12 @@ const themes = {
 		highlight: 'redBright',
 		gradient: 'teen',
 	},
+	retro: {
+		accent: 'greenBright',
+		text: 'green',
+		highlight: 'green',
+		bg: 'black',
+	},
 };
 
 export default themes;
